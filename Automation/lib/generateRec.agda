@@ -1,5 +1,6 @@
 -- {-# OPTIONS --verbose tc.unquote.decl:20 #-}
 
+{-# OPTIONS --rewriting #-}
 open import Data.List
 open import Function hiding (flip)
 open import Agda.Builtin.Reflection

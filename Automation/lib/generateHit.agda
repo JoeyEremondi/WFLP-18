@@ -1,16 +1,19 @@
 -- {-# OPTIONS --verbose tc.sample.debug:12 #-}
 -- {-# OPTIONS --type-in-type #-}
 
+{-# OPTIONS --rewriting #-}
 open import Data.List
 open import Data.Empty
 open import Function hiding (flip)
-open import Agda.Builtin.Reflection
+open import Reflection
+open import Reflection.Term
 open import Agda.Primitive
 open import Agda.Builtin.Unit
 open import Agda.Builtin.Equality
 open import Agda.Builtin.Bool
 open import Agda.Builtin.Nat
 open import Automation.utils.reflectionUtils
+open import Agda.Builtin.Reflection using (primQNameEquality)
 
 module Automation.lib.generateHit where
 
@@ -32,7 +35,7 @@ defineHitCons base ind (x ∷ xs) (y ∷ ys) = do (defineHitCons base ind xs ys)
                                               ty ← (getType x)
                                               ty' ← (getHdType base ind ty)
                                               (declareDef (vArg y) ty')
-                                              (defineFun y (clause [] (con x []) ∷ []))
+                                              (defineFun y (clause [] [] (con x []) ∷ [] ) )
 defineHitCons base ind x y = pure tt
 
 defineHitPathCons : (paths : List Name) → (pathTypes : List Type) → TC ⊤
@@ -64,9 +67,9 @@ qualifyPath base ind ctrs ictrs (pi (arg info t1) (abs s t2)) = do t2' ← (qual
                                                                         }
                                                                     ; term' → pure (pi (arg info term') (abs s t2')) 
                                                                     }
-qualifyPath base ind ctrs ictrs (def x args) = case (primQNameEquality x (quote _≡_)) of λ 
+qualifyPath base ind ctrs ictrs (def x args) = case (primQNameEquality x (quote _≡_)) of λ
                                                 { true →
-                                                    do args' ← (map' (λ { (arg (arg-info visible relevant) term) →
+                                                    do args' ← (map' (λ { (vArg  term) →
                                                                              (do term' ← (changeBaseCtrs base ind ctrs ictrs term)
                                                                                  pure (vArg term'))
                                                                            ; argTerm → pure argTerm }) args)
@@ -88,21 +91,21 @@ defineHindType : (baseType : Name) → (indType : Name) → TC ⊤
 defineHindType baseType indType =
   do ty ← (getType baseType)
      (declareDef (vArg indType) ty)
-     (defineFun indType (clause [] (def baseType []) ∷ []))
+     (defineFun indType (clause [] [] (def baseType []) ∷ []))
 
 definePointHolder : (pointHolder : Name) → (lcons : List Name) → TC ⊤
 definePointHolder pointHolder lcons =
   do LQName ← (quoteTC (List Name))
      (declareDef (vArg pointHolder) LQName)
      lconsQ ← (quoteTC lcons)
-     (defineFun pointHolder (clause [] lconsQ ∷ []))
+     (defineFun pointHolder (clause [] [] lconsQ ∷ []))
 
 definePathHolder : (pathHolder : Name) → (lpaths : List Name) → TC ⊤
 definePathHolder pathHolder lpaths =
   do LQName ← (quoteTC (List Name))
      (declareDef (vArg pathHolder) LQName)
      lpathsQ ← (quoteTC lpaths)
-     (defineFun pathHolder (clause [] lpathsQ ∷ []))
+     (defineFun pathHolder (clause [] [] lpathsQ ∷ []))
 
 data-hit : ∀{ℓ₁} (baseType : Name) → (indType : Name) → (pointHolder : Name) → (lcons : List Name) → (pathHolder : Name) → (lpaths : List Name) →
                   (lpathTypes : (List (ArgPath {ℓ₁}))) → TC ⊤

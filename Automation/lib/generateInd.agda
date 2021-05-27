@@ -1,8 +1,8 @@
--- {-# OPTIONS --verbose tc.sample.debug:20 #-}
 
+{-# OPTIONS --rewriting #-}
 open import Data.List
 open import Function hiding (flip)
-open import Agda.Builtin.Reflection
+open import Reflection
 open import Agda.Primitive
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool
