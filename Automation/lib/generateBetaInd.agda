@@ -3,6 +3,7 @@
 
 open import Data.List
 open import Function hiding (flip)
+open import Reflection
 open import Agda.Builtin.Reflection
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool

@@ -65,7 +65,7 @@ getClauseDep' l ref R ty irefs (i ∷ is) (x ∷ xs) =
      ltm ← (getTermDep R ty il' irefs zero lcarg (lenlfarg ∷ lfarg) y')
      Ccon ← (getListElement ref lfarg)
      xs' ← (getClauseDep' l (suc ref) R ty irefs is xs)
-     pure ((clause (("x" , vArg unknown) ∷ (showNat lenlfarg , vArg unknown) ∷ map (λ _ → "vars" , vArg unknown) vars) (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
+     pure ((clause'  (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
 getClauseDep' l ref R ty irefs x y = pure [] -- Invalid case
 
 getClauseDep : Nat → Nat → (R : Name) → (ty : Name) → (lcons : List Name) → TC (List Clause)

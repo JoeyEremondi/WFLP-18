@@ -15,6 +15,7 @@ open import Data.String renaming (_++_ to _++S_)
 open import Data.List
 open import Data.Empty
 open import Function hiding (flip)
+open import Data.Product using (_,_ ; _×_)
 
 module Automation.utils.reflectionUtils where
 
@@ -141,6 +142,18 @@ take1 zero    xs       = []
 take1 (suc n) []       = []
 take1 (suc n) (x ∷ xs) = x ∷ (take1 n xs)
 --}
+
+{-# TERMINATING #-}
+defaultPatTele : Pattern → List ( String × Arg Type)
+defaultPatTele (con c ps) = concatMap defaultPatTele (map (λ { (arg _ p) → p }) ps)
+defaultPatTele (dot t) = []
+defaultPatTele (var x) = [ showNat x , vArg unknown ]
+defaultPatTele (lit l) = []
+defaultPatTele (proj f) = []
+defaultPatTele (absurd x) = [ showNat x , vArg unknown ]
+
+clause' :  (ps : List (Arg Pattern)) (t : Term) → Clause
+clause' ps t  = clause (concatMap (λ {(arg _ p) → defaultPatTele p}) ps) ps t
 
 dropTC : ∀ {a} {A : Set a} → Nat → List A → TC (List A)
 dropTC zero    xs       = return xs

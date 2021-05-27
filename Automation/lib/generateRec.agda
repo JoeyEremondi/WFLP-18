@@ -86,11 +86,11 @@ getClause' l ref R ty irefs (i ∷ is) (x ∷ xs) =
      case! isMemberBool true lb of λ
       { true →
         do ltm ← getTerm R ty inds irefs zero lcarg (lenlfarg ∷ lfarg) y'
-           pure ((clause ((("x" , vArg unknown)) ∷ (showNat lenlfarg , vArg unknown) ∷ map (λ _ → "varg" , vArg unknown) vars) (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
+           pure ((clause'  (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
       ; false →
         do y'' ← rmIndex i y'
            ltm ← getTerm R ty inds irefs zero lcarg (lenlfarg ∷ lfarg) y''
-           pure ((clause (((("x" , vArg unknown)) ∷ (showNat lenlfarg , vArg unknown) ∷ map (λ _ → "varg" , vArg unknown) vars)) (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
+           pure ((clause'  (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
       }
 getClause' l ref R ty irefs x y = pure [] -- Invalid case
 
