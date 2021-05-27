@@ -3,13 +3,16 @@
 {-# OPTIONS --rewriting #-}
 open import Data.List
 open import Function hiding (flip)
-open import Agda.Builtin.Reflection
+open import Reflection
+open import Reflection.Term
+open import Agda.Builtin.Reflection using (primQNameEquality)
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool
 open import Agda.Builtin.Unit
 open import Agda.Builtin.Equality
 open import Automation.utils.reflectionUtils
 open import Automation.lib.generateHit
+open import Data.Product using (_,_ ; _×_)
 
 module Automation.lib.generateRec where
 
@@ -83,11 +86,11 @@ getClause' l ref R ty irefs (i ∷ is) (x ∷ xs) =
      case! isMemberBool true lb of λ
       { true →
         do ltm ← getTerm R ty inds irefs zero lcarg (lenlfarg ∷ lfarg) y'
-           pure ((clause (vArg (con x laP) ∷ vArg (var (showNat lenlfarg)) ∷ vars) (var Ccon ltm)) ∷ xs')
+           pure ((clause ((("x" , vArg unknown)) ∷ (showNat lenlfarg , vArg unknown) ∷ map (λ _ → "varg" , vArg unknown) vars) (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
       ; false →
         do y'' ← rmIndex i y'
            ltm ← getTerm R ty inds irefs zero lcarg (lenlfarg ∷ lfarg) y''
-           pure ((clause (vArg (con x laP) ∷ vArg (var (showNat lenlfarg)) ∷ vars) (var Ccon ltm)) ∷ xs')
+           pure ((clause (((("x" , vArg unknown)) ∷ (showNat lenlfarg , vArg unknown) ∷ map (λ _ → "varg" , vArg unknown) vars)) (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
       }
 getClause' l ref R ty irefs x y = pure [] -- Invalid case
 

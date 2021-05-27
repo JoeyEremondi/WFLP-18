@@ -147,13 +147,13 @@ dropTC zero    xs       = return xs
 dropTC (suc n) []       = return []
 dropTC (suc n) (x ∷ xs) = bindTC (dropTC n xs) (λ xs' → return xs')
 
--- consArgs : Nat → (vis : List Bool) → Type → TC (List (Arg Pattern))
--- consArgs ref b (def qn ls) = return []
--- consArgs ref (b ∷ bs) (pi (arg info dom) (abs s cdom)) = bindTC (consArgs (suc ref) bs cdom)
---                                                                 (λ y → bindTC (return b) λ
---                                                                           { true → return (hArg (var {!!}) ∷ y) ;
---                                                                             false → return (vArg (var {!!}) ∷ y) })
--- consArgs ref b x = return (vArg (absurd {!!}) ∷ [])
+consArgs : Nat → (vis : List Bool) → Type → TC (List (Arg Pattern))
+consArgs ref b (def qn ls) = return []
+consArgs ref (b ∷ bs) (pi (arg info dom) (abs s cdom)) = bindTC (consArgs (suc ref) bs cdom)
+                                                                (λ y → bindTC (return b) λ
+                                                                          { true → return (hArg (var ref) ∷ y) ;
+                                                                            false → return (vArg (var ref) ∷ y) })
+consArgs ref b x = return (vArg (absurd ref) ∷ [])
 
 getClauseVars : Nat → Nat → TC (List (Arg Pattern))
 getClauseVars ref zero = return []

@@ -3,6 +3,8 @@
 open import Data.List
 open import Function hiding (flip)
 open import Reflection
+open import Agda.Builtin.Reflection using (primQNameEquality)
+open import Reflection.Term
 open import Agda.Primitive
 open import Agda.Builtin.Nat
 open import Agda.Builtin.Bool
@@ -11,6 +13,7 @@ open import Agda.Builtin.Equality
 open import Automation.utils.reflectionUtils
 open import Automation.lib.generateRec using (getMapConstructorType)
 
+open import Data.Product using (_,_ ; _×_)
 
 module Automation.lib.generateInd where
 
@@ -62,7 +65,7 @@ getClauseDep' l ref R ty irefs (i ∷ is) (x ∷ xs) =
      ltm ← (getTermDep R ty il' irefs zero lcarg (lenlfarg ∷ lfarg) y')
      Ccon ← (getListElement ref lfarg)
      xs' ← (getClauseDep' l (suc ref) R ty irefs is xs)
-     pure ((clause (vArg (con x laP) ∷ vArg (var (showNat lenlfarg)) ∷ vars) (var Ccon ltm)) ∷ xs')
+     pure ((clause (("x" , vArg unknown) ∷ (showNat lenlfarg , vArg unknown) ∷ map (λ _ → "vars" , vArg unknown) vars) (vArg (con x laP) ∷ vArg (var lenlfarg) ∷ vars) (var Ccon ltm)) ∷ xs')
 getClauseDep' l ref R ty irefs x y = pure [] -- Invalid case
 
 getClauseDep : Nat → Nat → (R : Name) → (ty : Name) → (lcons : List Name) → TC (List Clause)
@@ -113,7 +116,7 @@ getMapConstructorTypeInd Cref pars inds args R mapTy ctype cns (def x lsargs) =
         pure (var Cref (indexH ++L (vArg (con cns cargs) ∷ [])))
    ; false →
      case null lsargs of λ
-       { true → returnTC (def x [])
+       { true → return (def x [])
        ; false →
          do lsargs' ←
               (map' (λ { (arg i term) →
